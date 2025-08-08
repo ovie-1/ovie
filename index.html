@@ -186,12 +186,6 @@
    替换 img 为你真实的缩略图和大图 URL
 */
 const worksData = [
-  { title: "UI 项目 · 商业面板", desc: "为 B2B 仪表盘设计的现代化交互界面，注重数据可读性。", img: "https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=1200&auto=format&fit=crop", category: "UI" },
-  { title: "概念插画 · 城市之梦", desc: "以赛博城市为灵感的概念插画系列。", img: "https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d?q=80&w=1200&auto=format&fit=crop", category: "插画" },
-  { title: "动画短片 · 微交互合集", desc: "一系列 UI 微交互动画，提升用户体验的细节。", img: "https://images.unsplash.com/photo-1509395176047-4a66953fd231?q=80&w=1200&auto=format&fit=crop", category: "动画" },
-  { title: "概念插画 · 星辰", desc: "抽象风插画，尝试光线与材质的混搭。", img: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1200&auto=format&fit=crop", category: "插画" }
-];
-
 /* ========== DOM references ========== */
 const grid = document.getElementById('works');
 const filterBar = document.getElementById('filters');
@@ -290,7 +284,7 @@ window.addEventListener('scroll', () => {
 });
 
 /* ========== 英雄区动态标题（打字循环） ========== */
-const phrases = ["交互为先", "视觉讲故事", "细节即体验"]; // <- 可自定义短语
+const phrases = ["善良", "美丽", "聪明"]; // <- 可自定义短语
 const typeEl = document.getElementById('type');
 let ti = 0, ci = 0, deleting = false;
 function typeLoop(){
