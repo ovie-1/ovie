@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>我的豪华作品集（含视差与动态标题）</title>
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<style>
+  :root{
+    --bg:#0f0f12;
+    --card:#161618;
+    --accent:#ff9800;
+    --muted:#bdbdbd;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+    background:var(--bg);
+    color:#fff;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+
+  /* header */
+  header{
+    position:fixed; top:0; left:0; right:0;
+    height:64px; display:flex; align-items:center;
+    justify-content:space-between; padding:0 24px;
+    z-index:60;
+    background:linear-gradient(180deg, rgba(15,15,18,0.9), rgba(15,15,18,0.6));
+    backdrop-filter: blur(6px);
+    border-bottom:1px solid rgba(255,255,255,0.02);
+  }
+  header .brand{font-weight:700; letter-spacing:0.4px;}
+  header nav a{color:#fff; text-decoration:none; margin-left:18px; font-weight:600; opacity:0.95}
+  header nav a:hover{color:var(--accent)}
+
+  /* hero with parallax layers */
+  .hero {
+    position:relative;
+    min-height:72vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:120px 20px 60px;
+    overflow:hidden;
+  }
+  .hero .layers{
+    position:absolute; inset:0; pointer-events:none;
+  }
+  .layer{
+    position:absolute; inset:0; background-position:center; background-size:cover;
+    transform-origin:center;
+    will-change:transform,opacity;
+  }
+  /* Example: use semi-opaque dark overlay */
+  .layer.overlay { background: linear-gradient(180deg, rgba(2,2,4,0.3), rgba(2,2,4,0.6)); mix-blend-mode:normal; }
+
+  .hero-inner{
+    position:relative; z-index:10; max-width:1100px;
+    padding:40px 18px;
+  }
+  .eyebrow{ color:var(--muted); font-size:14px; margin-bottom:12px; opacity:0.9 }
+  .hero-title{ font-size:44px; line-height:1.05; margin:0 0 16px; font-weight:800; letter-spacing:-0.5px;}
+  .hero-sub{ color:var(--muted); max-width:760px; margin:0 auto 22px; font-size:17px }
+
+  .type {
+    display:inline-block;
+    color:var(--accent);
+    white-space:nowrap;
+    border-right: 2px solid rgba(255,255,255,0.12);
+    padding-right:6px;
+    margin-left:8px;
+    font-weight:800;
+  }
+
+  /* filter */
+  .filter-bar{ text-align:center; margin:26px 0 8px; z-index:20; position:relative; }
+  .filter-btn{
+    background:transparent; border:1px solid rgba(255,255,255,0.06);
+    color:#fff; padding:8px 14px; margin:6px; border-radius:999px; cursor:pointer;
+    font-weight:600; transition:all .25s;
+  }
+  .filter-btn:hover{ transform:translateY(-3px); border-color:var(--accent)}
+  .filter-btn.active{ background:linear-gradient(90deg,var(--accent), #ffb66b); color:#111; border-color:transparent; box-shadow:0 6px 24px rgba(255,152,0,0.14) }
+
+  /* grid */
+  .grid{
+    max-width:1200px; margin: 0 auto 64px; padding: 0 18px;
+    display:grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap:18px;
+  }
+  .card{
+    background:var(--card); border-radius:12px; overflow:hidden; cursor:pointer;
+    display:flex; flex-direction:column; box-shadow:0 6px 24px rgba(0,0,0,0.5);
+    transform-origin:center; will-change:transform,opacity;
+  }
+  .thumb{ width:100%; height:180px; object-fit:cover; display:block; }
+  .card-info{ padding:14px 16px; }
+  .card-info h3{ margin:0 0 8px; font-size:18px }
+  .card-info p{ margin:0; color:var(--muted); font-size:13.5px; line-height:1.45 }
+
+  /* modal */
+  .modal{
+    position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+    background:rgba(2,2,2,0.76); z-index:80; opacity:0; pointer-events:none; transition:opacity .25s;
+  }
+  .modal.open{ opacity:1; pointer-events:auto; }
+  .modal-card{
+    width:min(920px,94%); max-height:88vh; overflow:auto; border-radius:12px; background:#0c0c0d;
+    padding:18px; box-shadow:0 30px 80px rgba(0,0,0,0.7);
+  }
+  .modal-card img{ width:100%; border-radius:8px; display:block; margin-bottom:12px; }
+  .close{ position:absolute; right:22px; top:22px; font-size:28px; color:#fff; background:none; border:none; cursor:pointer }
+
+  footer{ padding:40px 18px; text-align:center; color:var(--muted); border-top:1px solid rgba(255,255,255,0.02) }
+
+  /* responsive tweaks */
+  @media (max-width:720px){
+    .hero-title{ font-size:28px }
+    .thumb{ height:160px }
+    header{ padding:0 14px }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">AOHUI（示例名字）</div>
+  <nav>
+    <a href="#works">作品</a>
+    <a href="#contact">联系</a>
+  </nav>
+</header>
+
+<section class="hero" id="top">
+  <div class="layers" aria-hidden="true">
+    <!-- 背景层：替换下面 background-image url 为你的高质量背景图（建议 2000px 宽） -->
+    <div class="layer" data-speed="0.05" style="background-image: url('https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=2000&auto=format&fit=crop'); filter:brightness(0.6)"></div>
+    <!-- 中景装饰 -->
+    <div class="layer" data-speed="0.12" style="background-image: url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=2000&auto=format&fit=crop'); opacity:0.22; mix-blend-mode:screen"></div>
+    <!-- 深色叠加 -->
+    <div class="layer overlay" data-speed="0.0"></div>
+  </div>
+
+  <div class="hero-inner">
+    <div class="eyebrow">个人作品 • 视觉设计 / 交互 / 插画</div>
+    <h1 class="hero-title">让创意「说话」<span class="type" id="type"></span></h1>
+    <p class="hero-sub">我把故事、交互与视觉结合，制作可触达用户情感的作品。向下滚动查看精选项目，点击卡片可查看大图与详细说明。</p>
+  </div>
+</section>
+
+<div class="filter-bar" id="filters">
+  <button class="filter-btn active" data-filter="all">全部</button>
+  <button class="filter-btn" data-filter="UI">UI 设计</button>
+  <button class="filter-btn" data-filter="插画">插画</button>
+  <button class="filter-btn" data-filter="动画">动画</button>
+</div>
+
+<section class="grid" id="works"></section>
+
+<!-- Modal preview -->
+<div class="modal" id="modal" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="close" id="closeBtn" aria-label="关闭">&times;</button>
+    <img id="modalImg" src="" alt="">
+    <h2 id="modalTitle" style="margin:8px 0 6px"></h2>
+    <p id="modalDesc" style="color:var(--muted)"></p>
+  </div>
+</div>
+
+<footer id="contact">
+  <div>联系我：<a href="mailto:your@email.com" style="color:var(--accent)">your@email.com</a>
+  · <a href="#" style="color:var(--accent)">Instagram</a> · <a href="#" style="color:var(--accent)">LinkedIn</a></div>
+  <div style="margin-top:12px; font-size:13px; color: #8f8f8f">© <span id="year"></span> AOHUI — All rights reserved</div>
+</footer>
+
+<!-- GSAP + ScrollTrigger（CDN）-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+<script>
+/* ========== 配置：作品数据（JSON 数组） ========== 
+   只需在这里添加 / 修改对象即可（title, desc, img, category）
+   替换 img 为你真实的缩略图和大图 URL
+*/
+const worksData = [
+  { title: "UI 项目 · 商业面板", desc: "为 B2B 仪表盘设计的现代化交互界面，注重数据可读性。", img: "https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=1200&auto=format&fit=crop", category: "UI" },
+  { title: "概念插画 · 城市之梦", desc: "以赛博城市为灵感的概念插画系列。", img: "https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d?q=80&w=1200&auto=format&fit=crop", category: "插画" },
+  { title: "动画短片 · 微交互合集", desc: "一系列 UI 微交互动画，提升用户体验的细节。", img: "https://images.unsplash.com/photo-1509395176047-4a66953fd231?q=80&w=1200&auto=format&fit=crop", category: "动画" },
+  { title: "UI 项目 · 电商体验", desc: "移动端电商的全流程交互与视觉系统设计。", img: "https://images.unsplash.com/photo-1520880867055-1e30d1cb001c?q=80&w=1200&auto=format&fit=crop", category: "UI" },
+  { title: "概念插画 · 星辰", desc: "抽象风插画，尝试光线与材质的混搭。", img: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1200&auto=format&fit=crop", category: "插画" }
+];
+
+/* ========== DOM references ========== */
+const grid = document.getElementById('works');
+const filterBar = document.getElementById('filters');
+const filterBtns = filterBar.querySelectorAll('.filter-btn');
+const modal = document.getElementById('modal');
+const modalImg = document.getElementById('modalImg');
+const modalTitle = document.getElementById('modalTitle');
+const modalDesc = document.getElementById('modalDesc');
+const closeBtn = document.getElementById('closeBtn');
+
+/* 年份 */
+document.getElementById('year').textContent = new Date().getFullYear();
+
+/* ========== 渲染卡片 ========== */
+function renderWorks(filter='all') {
+  grid.innerHTML = '';
+  const items = filter === 'all' ? worksData : worksData.filter(w => w.category === filter);
+  items.forEach((w, idx) => {
+    const el = document.createElement('article');
+    el.className = 'card';
+    el.setAttribute('data-index', idx);
+    el.innerHTML = `
+      <img class="thumb" src="${w.img}" alt="${escapeHtml(w.title)}">
+      <div class="card-info">
+        <h3>${escapeHtml(w.title)}</h3>
+        <p>${escapeHtml(w.desc)}</p>
+      </div>
+    `;
+    el.addEventListener('click', () => openModal(w));
+    grid.appendChild(el);
+  });
+  // 触发进入视口的动画（使用 ScrollTrigger）
+  gsap.utils.toArray('.card').forEach(card => {
+    gsap.fromTo(card, { autoAlpha:0, y:20, scale:0.985 }, {
+      duration:0.7, autoAlpha:1, y:0, scale:1, ease:'power3.out',
+      scrollTrigger: { trigger: card, start:'top 85%' }
+    });
+  });
+}
+
+/* escape 防注入（简单处理） */
+function escapeHtml(t){ return String(t).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s])) }
+
+/* ========== 筛选逻辑（按钮） ========== */
+filterBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelector('.filter-btn.active')?.classList.remove('active');
+    btn.classList.add('active');
+    // 为了平滑效果，先对现有卡片做淡出动画，再渲染
+    gsap.to('.card', { opacity:0, scale:0.97, stagger:0.06, duration:0.22, ease:'power2.in', onComplete: () => renderWorks(btn.dataset.filter) });
+  });
+});
+
+/* ========== modal 打开/关闭 ========== */
+function openModal(work){
+  modalImg.src = work.img;
+  modalTitle.textContent = work.title;
+  modalDesc.textContent = work.desc;
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  // 简单动画
+  gsap.fromTo('.modal-card', {scale:0.98, autoAlpha:0}, {scale:1, autoAlpha:1, duration:0.28, ease:'back.out(1.2)'});
+}
+function closeModal(){
+  modal.classList.remove('open');
+  document.body.style.overflow = '';
+}
+closeBtn.addEventListener('click', closeModal);
+modal.addEventListener('click', e => { if(e.target === modal) closeModal(); });
+
+/* ========== 背景视差（滚动 + 鼠标移动） ========== */
+const layers = document.querySelectorAll('.layer');
+/* 鼠标移动视差（细微） */
+window.addEventListener('mousemove', (e) => {
+  const cx = window.innerWidth/2, cy = window.innerHeight/2;
+  const dx = (e.clientX - cx) / cx; // -1..1
+  const dy = (e.clientY - cy) / cy;
+  layers.forEach((L, i) => {
+    const speed = parseFloat(L.dataset.speed) || 0;
+    const tx = dx * 10 * speed; // x偏移
+    const ty = dy * 10 * speed; // y偏移
+    L.style.transform = `translate3d(${tx}px, ${ty}px, 0) scale(${1 + speed*0.03})`;
+  });
+});
+/* 滚动视差（根据 scrollY） */
+window.addEventListener('scroll', () => {
+  const s = window.scrollY;
+  layers.forEach(L => {
+    const speed = parseFloat(L.dataset.speed) || 0;
+    const y = -s * speed * 0.6;
+    // 保留鼠标移动 transform 的同时添加 translateY
+    const prev = L.style.transform || '';
+    // 简单合并（覆盖 translateY 部分）
+    L.style.transform = `translate3d(0px, ${y}px, 0) ${prev.includes('scale') ? prev.split(' ').pop() : ''}`;
+  });
+});
+
+/* ========== 英雄区动态标题（打字循环） ========== */
+const phrases = ["交互为先", "视觉讲故事", "细节即体验"]; // <- 可自定义短语
+const typeEl = document.getElementById('type');
+let ti = 0, ci = 0, deleting = false;
+function typeLoop(){
+  const full = phrases[ti];
+  if(!deleting){
+    ci++;
+    typeEl.textContent = full.substring(0, ci);
+    if(ci === full.length){ deleting = true; setTimeout(typeLoop, 900); return; }
+  } else {
+    ci--;
+    typeEl.textContent = full.substring(0, ci);
+    if(ci === 0){ deleting = false; ti = (ti+1)%phrases.length; setTimeout(typeLoop, 200); return; }
+  }
+  setTimeout(typeLoop, deleting ? 40 : 70);
+}
+typeLoop();
+
+/* ========== 初始渲染 ========== */
+gsap.registerPlugin(ScrollTrigger);
+renderWorks('all');
+
+/* 触屏友好：减少 mousemove 频率以节省性能（可选） */
+// （已用简单 listener；在低端设备可进一步优化或禁用）
+</script>
+</body>
+</html>
